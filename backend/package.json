@@ -2,7 +2,7 @@
   "name": "leadflow-crm-backend",
   "version": "1.0.0",
   "description": "LeadFlow CRM Backend API",
-  "main": "dist/server.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",

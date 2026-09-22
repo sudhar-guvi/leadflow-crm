@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/leadflow-crm';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 export const connectDB = async (retries = 5, delay = 2000): Promise<void> => {
   while (retries > 0) {

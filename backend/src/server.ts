@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -65,34 +65,53 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Start server
-const startServer = async () => {
+// Connect to MongoDB when the app starts (or when the serverless function initializes)
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (isConnected) {
+    return;
+  }
+  
   try {
-    // Connect to MongoDB
     await connectDB();
-    
-    app.listen(PORT, () => {
-      console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🔗 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
-      console.log(`\n📡 API Endpoints:`);
-      console.log(`   - GET    /health`);
-      console.log(`   - GET    /api/leads`);
-      console.log(`   - POST   /api/leads`);
-      console.log(`   - GET    /api/payments`);
-      console.log(`   - GET    /api/followups`);
-      console.log(`   - GET    /api/notifications`);
-      console.log(`   - GET    /api/courses`);
-      console.log(`   - GET    /api/dashboard/summary`);
-      console.log(`   - GET    /api/reports/*`);
-      console.log('\n');
-    });
+    isConnected = true;
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.error('Database connection error:', error);
+    throw error;
   }
 };
 
-startServer();
+// Start server (for local development)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const startServer = async () => {
+    try {
+      await connectToDatabase();
+      
+      app.listen(PORT, () => {
+        console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+        console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🔗 CORS Origin: ${process.env.CORS_ORIGIN || '*'}`);
+        console.log(`\n📡 API Endpoints:`);
+        console.log(`   - GET    /health`);
+        console.log(`   - GET    /api/leads`);
+        console.log(`   - POST   /api/leads`);
+        console.log(`   - GET    /api/payments`);
+        console.log(`   - GET    /api/followups`);
+        console.log(`   - GET    /api/notifications`);
+        console.log(`   - GET    /api/courses`);
+        console.log(`   - GET    /api/dashboard/summary`);
+        console.log(`   - GET    /api/reports/*`);
+        console.log('\n');
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
+  };
+  
+  startServer();
+}
 
+// Export for Vercel serverless functions
 export default app;
