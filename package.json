@@ -8,6 +8,8 @@
     "install:all": "cd backend && npm install && cd ../frontend && npm install"
   },
   "devDependencies": {
+    "@vercel/node": "^3.0.0",
+    "typescript": "^5.3.3",
     "concurrently": "^8.2.2"
   }
 }
