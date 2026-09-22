@@ -1,6 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -35,4 +33,4 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     ],
     note: 'Please set MONGODB_URI environment variable to enable full functionality'
   });
-}
+};
