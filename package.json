@@ -2,5 +2,12 @@
   "name": "leadflow-crm",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["frontend", "backend"]
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "build": "cd frontend && npm install && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }

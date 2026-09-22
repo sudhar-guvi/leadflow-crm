@@ -2,10 +2,20 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// Cache the database connection for serverless
+let cachedConnection: typeof mongoose | null = null;
+
 export const connectDB = async (retries = 5, delay = 2000): Promise<void> => {
+  // Return cached connection if available
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    console.log('✅ Using cached MongoDB connection');
+    return;
+  }
+
   while (retries > 0) {
     try {
-      const conn = await mongoose.connect(MONGODB_URI);
+      const conn = await mongoose.connect(MONGODB_URI!);
+      cachedConnection = conn;
       console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
       
       // Create indexes for better performance
