@@ -66,8 +66,9 @@ try {
     dashboard: require('../backend/dist/controllers/dashboard.js'),
     reports: require('../backend/dist/controllers/reports.js'),
   };
+  console.log('✅ Controllers loaded successfully');
 } catch (e) {
-  console.log('Controllers not yet compiled:', e.message);
+  console.log('⚠️ Controllers not yet compiled:', e.message);
 }
 
 // ============ ROUTES ============
@@ -97,6 +98,7 @@ app.get('/api', (req, res) => {
     version: '1.0.0',
     status: 'running',
     mongodb: isConnected ? 'connected' : 'disconnected',
+    controllersLoaded: Object.keys(controllers).length > 0,
     endpoints: {
       leads: ['GET /api/leads', 'POST /api/leads', 'GET /api/leads/:id', 'PUT /api/leads/:id', 'DELETE /api/leads/:id'],
       payments: ['GET /api/payments'],
