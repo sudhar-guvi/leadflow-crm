@@ -471,6 +471,151 @@ app.get('/api/dashboard/summary', async (req, res) => {
   }
 });
 
+// ============ REPORTS ============
+app.get('/api/reports/lead-status', async (req, res) => {
+  try {
+    await connectToDatabase();
+    const { Lead } = getModels();
+    const report = await Lead.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+          amount: { $sum: '$courseAmount' }
+        }
+      },
+      { $project: { _id: 0, status: '$_id', count: 1, amount: 1 } }
+    ]);
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching lead status report:', error);
+    res.status(500).json({ error: 'Failed to fetch lead status report', message: error.message });
+  }
+});
+
+app.get('/api/reports/bd-performance', async (req, res) => {
+  try {
+    await connectToDatabase();
+    const { Lead } = getModels();
+    const report = await Lead.aggregate([
+      {
+        $group: {
+          _id: { bdId: '$bdId', bdName: '$bdName' },
+          totalLeads: { $sum: 1 },
+          convertedLeads: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, 1, 0] } },
+          revenue: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, '$courseAmount', 0] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          bdId: '$_id.bdId',
+          bdName: '$_id.bdName',
+          totalLeads: 1,
+          convertedLeads: 1,
+          conversionRate: { $multiply: [{ $divide: ['$convertedLeads', '$totalLeads'] }, 100] },
+          revenue: 1
+        }
+      },
+      { $sort: { revenue: -1 } }
+    ]);
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching BD performance report:', error);
+    res.status(500).json({ error: 'Failed to fetch BD performance report', message: error.message });
+  }
+});
+
+app.get('/api/reports/revenue', async (req, res) => {
+  try {
+    await connectToDatabase();
+    const { Payment } = getModels();
+    const year = new Date().getFullYear();
+    const report = await Payment.aggregate([
+      { $match: { paymentStatus: 'paid', createdAt: { $gte: new Date(`${year}-01-01`) } } },
+      { $group: { _id: { $month: '$createdAt' }, revenue: { $sum: '$amount' }, conversions: { $sum: 1 } } },
+      {
+        $project: {
+          _id: 0,
+          month: { $arrayElemAt: [['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], '$_id'] },
+          revenue: 1,
+          conversions: 1
+        }
+      },
+      { $sort: { month: 1 } }
+    ]);
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching revenue report:', error);
+    res.status(500).json({ error: 'Failed to fetch revenue report', message: error.message });
+  }
+});
+
+app.get('/api/reports/source-distribution', async (req, res) => {
+  try {
+    await connectToDatabase();
+    const { Lead } = getModels();
+    const report = await Lead.aggregate([
+      {
+        $group: {
+          _id: '$source',
+          count: { $sum: 1 },
+          convertedCount: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, 1, 0] } },
+          revenue: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, '$courseAmount', 0] } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          source: '$_id',
+          count: 1,
+          convertedCount: 1,
+          conversionRate: { $multiply: [{ $divide: ['$convertedCount', '$count'] }, 100] },
+          revenue: 1
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching source distribution report:', error);
+    res.status(500).json({ error: 'Failed to fetch source distribution report', message: error.message });
+  }
+});
+
+app.get('/api/reports/course-popularity', async (req, res) => {
+  try {
+    await connectToDatabase();
+    const { Lead } = getModels();
+    const report = await Lead.aggregate([
+      {
+        $group: {
+          _id: { courseId: '$courseId', courseName: '$courseName' },
+          totalLeads: { $sum: 1 },
+          convertedLeads: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, 1, 0] } },
+          revenue: { $sum: '$courseAmount' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          courseId: '$_id.courseId',
+          courseName: '$_id.courseName',
+          totalLeads: 1,
+          convertedLeads: 1,
+          conversionRate: { $multiply: [{ $divide: ['$convertedLeads', '$totalLeads'] }, 100] },
+          revenue: 1
+        }
+      },
+      { $sort: { totalLeads: -1 } }
+    ]);
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching course popularity report:', error);
+    res.status(500).json({ error: 'Failed to fetch course popularity report', message: error.message });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
