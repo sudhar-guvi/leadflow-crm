@@ -18,11 +18,11 @@ const bdUsers = [
 
 // Course data
 const courses = [
-  { name: 'Full Stack Web Development', description: 'Complete MERN stack course', duration: '6 months', amount: 45000, category: 'Development' },
-  { name: 'Data Science Bootcamp', description: 'Python, ML, AI fundamentals', duration: '4 months', amount: 55000, category: 'Data Science' },
-  { name: 'Android App Development', description: 'Kotlin and Jetpack Compose', duration: '4 months', amount: 40000, category: 'Mobile Development' },
-  { name: 'Cloud Computing - AWS', description: 'AWS certification track', duration: '3 months', amount: 35000, category: 'Cloud' },
-  { name: 'UI/UX Design', description: 'Figma, Adobe XD, User Research', duration: '3 months', amount: 30000, category: 'Design' },
+  { code: 'FSWD', name: 'Full Stack Web Development', description: 'Complete MERN stack course', duration: '6 months', amount: 45000, category: 'Development' },
+  { code: 'DSB', name: 'Data Science Bootcamp', description: 'Python, ML, AI fundamentals', duration: '4 months', amount: 55000, category: 'Data Science' },
+  { code: 'AAD', name: 'Android App Development', description: 'Kotlin and Jetpack Compose', duration: '4 months', amount: 40000, category: 'Mobile Development' },
+  { code: 'AWS', name: 'Cloud Computing - AWS', description: 'AWS certification track', duration: '3 months', amount: 35000, category: 'Cloud' },
+  { code: 'UIUX', name: 'UI/UX Design', description: 'Figma, Adobe XD, User Research', duration: '3 months', amount: 30000, category: 'Design' },
 ];
 
 // Lead samples covering all scenarios

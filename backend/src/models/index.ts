@@ -126,6 +126,7 @@ export interface Course {
   _id: string;
   id: string;
   name: string;
+  code: string;
   description?: string;
   duration: string;
   amount: number;

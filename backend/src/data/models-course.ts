@@ -4,6 +4,7 @@ import { Course } from '../models/index.js';
 const courseSchema = new Schema<Course & Document>(
   {
     name: { type: String, required: true, trim: true },
+    code: { type: String, required: true, unique: true, trim: true },
     description: { type: String },
     duration: { type: String, required: true, default: '3 months' },
     amount: { type: Number, required: true, min: 0 },

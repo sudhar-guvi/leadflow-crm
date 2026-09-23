@@ -20,6 +20,7 @@ const courseToJson = (doc: any): Course => ({
   _id: doc._id.toString(),
   id: doc._id.toString(),
   name: doc.name,
+  code: doc.code,
   description: doc.description,
   duration: doc.duration,
   amount: doc.amount,
